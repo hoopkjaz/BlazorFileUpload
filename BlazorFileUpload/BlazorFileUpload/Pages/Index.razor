@@ -1,10 +1,20 @@
 ﻿@page "/"
 @using BlazorFileUpload.Data;
+@using BlazorFileUploadLib;
 @inject IConfiguration config
+@inject ISqlDataAccess sql
 
 <PageTitle>Upload Demo App</PageTitle>
 
 <h1>Upload Demo</h1>
+
+<h3>Technology Used</h3>
+<ul class="text-info">
+    <li>C# Dot Net Core 7.0</li>
+    <li>Blazor Server</li>
+    <li>SQL Server</li>
+    <li>Dapper</li>    
+</ul>
 
 <EditForm Model="newCustomer" OnValidSubmit="SubmitForm">
     <div>
@@ -39,18 +49,26 @@
 }
 
 @code{
-    private long maxFileSize = 1024 * 1024 *3; //represents 3MB
-                                                //private int maxAllowedFiles = 3;
+    private long maxFileSize = 1024 * 1024 * 3; //represents 3MB                                               
     private List<string> errors = new();
     private CustomerModel newCustomer = new();
     private IBrowserFile? file;
 
     private async Task SubmitForm()
     {
+        errors.Clear();
+
         try
         {
             string relativePath = await CaptureFile();
             newCustomer.FileName = relativePath;
+
+            await sql.SaveData("dbo.spCustomer_Insert", "Default", newCustomer);
+
+            newCustomer = new();
+            file = null;
+            errors.Clear();
+
         }
         catch (Exception ex)
         {
