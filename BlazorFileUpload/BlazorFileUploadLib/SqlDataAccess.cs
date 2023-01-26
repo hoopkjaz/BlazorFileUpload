@@ -17,7 +17,6 @@ namespace BlazorFileUploadLib
         {
             this._config = config;
         }
-
         public async Task SaveData(string storeProc, string connectionName, object parameters)
         {
             string connString = _config.GetConnectionString(connectionName) ?? throw new Exception($"Missing connection string at {connectionName}");
@@ -28,5 +27,19 @@ namespace BlazorFileUploadLib
                 parameters,
                 commandType: System.Data.CommandType.StoredProcedure);
         }
+
+        public async Task<List<T>> LoadData<T>(string storeProc, string connectionName, object? parameters)
+        {
+            string connString = _config.GetConnectionString(connectionName) ?? throw new Exception($"Missing connection string at {connectionName}");
+
+            using var connection = new SqlConnection(connString);
+
+            var rows = await connection.QueryAsync<T>(storeProc,
+                parameters,
+                commandType: System.Data.CommandType.StoredProcedure);
+
+            return rows.ToList();
+        }
+
     }
 }
