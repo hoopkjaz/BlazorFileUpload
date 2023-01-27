@@ -32,6 +32,9 @@
         <InputFile OnChange="@LoadFiles" accept=".png,.jpg,.jpeg" class="form-control" />
     </div>
 
+    <div>
+    
+    </div>
     <button class="btn btn-primary mt-3" type="submit">Create Customer</button>
 </EditForm>
 
@@ -150,6 +153,17 @@
 
         try
         {
+            // BEST PRACTICES...............................................................
+            // Make sure to add a check of the file name
+            // Limit files to allowed types. Check extension type and make sure no exe files
+            // Limit the number and size of files.  Add a way to resize images.
+            // Associate the file with other data like user data
+            // No Anonymous login uploads
+            // always store a relative path
+            // don't store files with you website.  use Azure storage
+            // create a backup policy for your files
+         
+
             string newFileName = Path.ChangeExtension(
                     Path.GetRandomFileName(),
                     Path.GetExtension(file.Name));
@@ -167,6 +181,7 @@
 
             await using FileStream fs = new(path, FileMode.Create);
             await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+                     
 
             return relativePath;
         }
@@ -177,5 +192,5 @@
         }
     }
 
-
- }
+    
+}
